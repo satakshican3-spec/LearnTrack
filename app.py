@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from streamlit_player import st_player
+
 st.set_page_config(page_title="LearnTrack 8-12", layout="wide")
 
 if 'xp' not in st.session_state:
