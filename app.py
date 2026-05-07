@@ -39,7 +39,7 @@ elif page == "Task Manager":
     st.write("---")
     for i, task_obj in enumerate(st.session_state.tasks):
         col1, col2 = st.columns([0.1, 0.9])
-        is_done = col1.checkbox("", key=f"task_{i}", value=task_obj["done"])
+        is_done = st.checkbox(task_obj["task"], key=f"task_{i}", value=task_obj["done"])
         st.session_state.tasks[i]["done"] = is_done
         if is_done:
             col2.write(f"~~{task_obj['task']}~~")
