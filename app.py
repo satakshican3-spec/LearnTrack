@@ -18,6 +18,17 @@ page = st.sidebar.radio("Navigation", ["Dashboard", "Task Manager", "Study Timer
 
 if page == "Dashboard":
     st.title("Student Dashboard")
+
+    quotes = [
+        "Mind and Hand: Learning by doing.",
+        "Grit is passion and perseverance for long-term goals.",
+        "The best way to predict the future is to invent it.",
+        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+        "The only way to do great work is to love what you do."
+    ]
+    st.write(f"*\"{random.choice(quotes)}\"*")
+
+    st.write("---")
     st.write(f"Total XP Earned: {st.session_state.xp}")
     st.write("---")
     st.write("Academic Overview")
