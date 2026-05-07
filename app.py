@@ -14,7 +14,7 @@ st.sidebar.write(f"Current Level: {level}")
 st.sidebar.progress(min((st.session_state.xp % 100) / 100, 1.0))
 st.sidebar.caption(f"{100 - (st.session_state.xp % 100)} XP until next level")
 
-page = st.sidebar.radio("Navigation", [Dashboard", "Task Manager", "Study Timer", "Grade Predictor"])
+page = st.sidebar.radio("Navigation", ["Dashboard", "Task Manager", "Study Timer", "Grade Predictor"])
 
 if page == "Dashboard":
     st.title("Student Dashboard")
