@@ -1,52 +1,81 @@
 import streamlit as st
-import pandas as pd
-from datetime import datetime
 import time
 
-st.set_page_config(page_title="LearnTrack 8-12")
+st.set_page_config(page_title="LearnTrack 8-12", layout="wide")
 
-st.sidebar.title("LearnTrack 8-12")
-page = st.sidebar.radio("Go to:", ["Dashboard", "Study Timer", "Grade Predictor"])
+if 'xp' not in st.session_state:
+    st.session_state.xp = 0
+if 'tasks' not in st.session_state:
+    st.session_state.tasks = []
+
+st.sidebar.title("Academic Progress")
+level = (st.session_state.xp // 100) + 1
+st.sidebar.write(f"Current Level: {level}")
+st.sidebar.progress(min((st.session_state.xp % 100) / 100, 1.0))
+st.sidebar.caption(f"{100 - (st.session_state.xp % 100)} XP until next level")
+
+page = st.sidebar.radio("Navigation", [Dashboard", "Task Manager", "Study Timer", "Grade Predictor"])
 
 if page == "Dashboard":
-  st.title("Your Academic Dashboard")
-  st.write("Target: MIT Class of 2031")
+    st.title("Student Dashboard")
+    st.write(f"Total XP Earned: {st.session_state.xp}")
+    if level < 5:
+        st.info("Status: High School Student")
+    else:
+        st.success("Status: Advanced Candidate")
 
-  if 'total_study_time' not in st.session_state:
-      st.session_state.total_study_time = 0
+    st.write("---")
+    st.write("Current Goals:")
+    st.write("- Complete Grade 9 with honors")
+    st.write("- Build professional coding portfolio")
 
-  st.metric("Minutes Studied This Session", f"{st.session_state.total_study_time} mins")
-  st.info("Tip: Consistency is key for Grade 8-12 success!")
+elif page == "Task Manager":
+    st.title("Daily Tasks")
+    new_task = st.text_input("Enter a new task")
+    if st.button("Add Task"):
+        if new_task:
+            st.session_state.tasks.append({"task": new_task, "done": False})
+
+    st.write("---")
+    for i, task_obj in enumerate(st.session_state.tasks):
+        col1, col2 = st.columns([0.1, 0.9])
+        is_done = col1.checkbox("", key=f"task_{i}", value=task_obj["done"])
+        st.session_state.tasks[i]["done"] = is_done
+        if is_done:
+            col2.write(f"~~{task_obj['task']}~~")
+        else:
+            col2.write(task_obj["task"])
 
 elif page == "Study Timer":
     st.title("Focus Timer")
-    subject = st.selectbox("Subject", ["Math", "Science", "English", "French", "Coding"])
-    duration = st.number_input("Study Minutes", min_value=1, value=25)
+    st.write("---")
+    st.write("Study Music (Lo-Fi)")
+    st.video("https://youtube.com")
+    st.write("---")
 
-    if st.button("Start Timer"):
-        progress_text = st.empty()
+    subject = st.selectbox("Select Subject", ["Math", "Science", "Social Studies", "ELA", "French", "Coding"])
+    duration = st.number_input("Duration (Minutes)", min_value=1, value=25)
+
+    if st.button("Start Session"):
+        st.write(f"Currently focusing on {subject}...")
         bar = st.progress(0)
         for i in range(100):
             time.sleep((duration * 60) / 100)
             bar.progress(i + 1)
-            progress_text.text(f"Studying {subject}: {100-i}% remaining")
 
-        st.session_state.total_study_time += duration
-        st.balloons()
-        st.success(f"Great job! You logged {duration} minutes of {subject}.")
+        earned_xp = duration * 2
+        st.session_state.xp += earned_xp
+        st.success(f"Session complete. You have earned {earned_xp} XP.")
 
 elif page == "Grade Predictor":
     st.title("Grade Predictor")
-    st.write("Know exactly what you need on your next test.")
+    curr = st.number_input("Current Grade Percentage", 0, 100, 85)
+    target = st.number_input("Target Garde Percentage", 0, 100, 90)
+    weight = st.number_input("Final Assessment Weight (%)", 0, 100, 30)
 
-    curr_grade = st.number_input("Current Grade (%)", 0, 100, 85)
-    target_grade = st.number_input("Target Final Grade (%)", 0, 100, 90)
-    final_weight = st.number_input("Final Exam Weight (%)", 0, 100, 30)
-
-    if st.button("Calculate Needed Score"):
-        needed = (target_grade - (curr_grade * (1 - (final_weight/100)))) / (final_weight/100)
-
+    if st.button("Calculate Requirement"):
+        needed = (target - (curr * (1 - (weight/100)))) / (weight/100)
         if needed > 100:
-            st.error(f"You need a {needed:.1f}%... that's a tough climb!")
+            st.error(f"Required Score: {needed:.1f}%. Additional study recommended.")
         else:
-            st.success(f"To hit {target_grade}%, you need a {needed:.1f}% on the final.")
+            st.success(f"Required Score: {needed:.1f}%")
