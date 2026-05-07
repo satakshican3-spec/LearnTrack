@@ -42,8 +42,7 @@ elif page == "Task Manager":
 
 elif page == "Study Timer":
     st.title("Focus Timer")
-    st.write("Study Music")
-    st.video("https://youtube.com")
+    st.write("Deep work session for focused learning.")
     st.write("---")
 
     subject = st.selectbox("Select Subject", ["Math", "Science", "Social Studies", "ELA", "French", "Coding"])
