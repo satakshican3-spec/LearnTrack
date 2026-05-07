@@ -1,11 +1,17 @@
 import streamlit as st
 import time
 import random
+import pandas as pd
 
 st.set_page_config(page_title="LearnTrack 8-12", layout="wide")
 
 if 'xp' not in st.session_state:
     st.session_state.xp = 0
+if 'subject_xp' not in st.session_state:
+    st.session_state.subject_xp = {
+        "Math":0, "Science":0, "Social Studies": 0,
+        "ELA": 0, "French": 0, "Coding": 0
+    }
 if 'tasks' not in st.session_state:
     st.session_state.tasks = []
 
