@@ -44,7 +44,7 @@ elif page == "Study Timer":
     st.title("Focus Timer")
     st.write("---")
     st.write("Study Music (Lo-Fi)")
-    st.video("https://youtu.be")
+    st_player("https://youtube.com")
     st.write("---")
 
     subject = st.selectbox("Select Subject", ["Math", "Science", "Social Studies", "ELA", "French", "Coding"])
