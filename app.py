@@ -43,9 +43,7 @@ elif page == "Task Manager":
 elif page == "Study Timer":
     st.title("Focus Timer")
     st.write("---")
-
-    st.markdown('<iframe width="100%" height="315" src="https://youtube.com" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',, unsafe_allow_html=True)
-
+    st.markdown('<iframe width="100%" height="315" src="https://youtube.com" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>', unsafe_allow_html=True)
     st.write("---")
 
     subject = st.selectbox("Select Subject", ["Math", "Science", "Social Studies", "ELA", "French", "Coding"])
