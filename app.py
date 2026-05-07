@@ -19,15 +19,9 @@ page = st.sidebar.radio("Navigation", ["Dashboard", "Task Manager", "Study Timer
 if page == "Dashboard":
     st.title("Student Dashboard")
     st.write(f"Total XP Earned: {st.session_state.xp}")
-    if level < 5:
-        st.info("Status: High School Student")
-    else:
-        st.success("Status: Advanced Candidate")
-
     st.write("---")
-    st.write("Current Goals:")
-    st.write("- Complete Grade 9 with honors")
-    st.write("- Build professional coding portfolio")
+    st.write("Academic Overview")
+    st.info("Use the sidebar to navigate between your tasks, study timer, and grade predictor.")
 
 elif page == "Task Manager":
     st.title("Daily Tasks")
