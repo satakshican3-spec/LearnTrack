@@ -30,7 +30,12 @@ elif page == "Task Manager":
         if new_task:
             st.session_state.tasks.append({"task": new_task, "done": False})
 
+    if st.button("Clear Completed Tasks"):
+        st.session_state.tasks = [t for t in st.session_state.tasks if not t["done"]]
+        st.rerun()
+
     st.write("---")
+    
     for i, task_obj in enumerate(st.session_state.tasks):
         col1, col2 = st.columns([0.1, 0.9])
         is_done = st.checkbox(task_obj["task"], key=f"task_{i}", value=task_obj["done"])
