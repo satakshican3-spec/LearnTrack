@@ -1,96 +1,102 @@
 import streamlit as st
-import time
-import random
 import pandas as pd
+import random
+from datetime import datetime, timedelta
 
-st.set_page_config(page_title="LearnTrack 8-12", layout="wide")
+st.set_page_config(page_title="LearnTrack: Academic Gamification", layout="wide")
 
-if 'xp' not in st.session_state:
-    st.session_state.xp = 0
-if 'subject_xp' not in st.session_state:
-    st.session_state.subject_xp = {
-        "Math":0, "Science":0, "Social Studies": 0,
-        "ELA": 0, "French": 0, "Coding": 0
-    }
-if 'tasks' not in st.session_state:
-    st.session_state.tasks = []
+st.markdown("""
+    <style>
+    .stMetric { background-color: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .main { background: #0e1117; }
+    </style>
+    """, unsafe_allow_html=True)
 
-st.sidebar.title("Academic Progress")
-level = (st.session_state.xp // 100) + 1
-st.sidebar.write(f"Current Level: {level}")
-st.sidebar.progress(min((st.session_state.xp % 100) / 100, 1.0))
-st.sidebar.caption(f"{100 - (st.session_state.xp % 100)} XP until next level")
+if 'logs' not in st.session_state:
+    st.session_state.logs = []
+if 'streak' not in st.session_state:
+    st.session_state.streak = 0
+if 'last_log_date' not in st.session_state:
+    st.session_state.last_log_date = None
 
-page = st.sidebar.radio("Navigation", ["Dashboard", "Task Manager", "Study Timer", "Grade Predictor"])
+def calculate_metrics():
+    df = pd.DataFrame(st.session_state.logs)
+    if df.empty:
+        return 0, 0, 0, 0
 
-if page == "Dashboard":
-    st.title("Student Dashboard")
+    total_hours = df['Hours'].sum()
+    total_xp = total_hours * 100
+    level = (total_xp // 500) + 1
 
-    quotes = [
-        "Mind and Hand: Learning by doing.",
-        "Grit is passion and perseverance for long-term goals.",
-        "The best way to predict the future is to invent it.",
-        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-        "The only way to do great work is to love what you do."
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    today_hours = df[df['Date'] == today_str]['Hours'].sum()
+
+    return total_hours, total_xp, int(level), today_hours
+
+def load_demo_data():
+    demo_logs = [
+        {"Date": (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d"),
+         "Subject": random.choice(["Math", "Science", "History", "French", "Coding"]),
+         "Hours": random.randint(1, 4)} for i in range(1, 6)
     ]
-    st.write(f"*\"{random.choice(quotes)}\"*")
+    st.session_state.logs = demo_logs
+    st.session_state.streak = 5
+    st.rerun()
 
-    st.write("---")
-    st.write(f"Total XP Earned: {st.session_state.xp}")
-    st.write("---")
-    st.write("Academic Overview")
-    st.info("Use the sidebar to navigate between your tasks, study timer, and grade predictor.")
+st.sidebar.title("LearnTrack v1.2")
+if st.sidebar.button("Load Demo Data"):
+    load_demo_data()
 
-elif page == "Task Manager":
-    st.title("Daily Tasks")
-    new_task = st.text_input("Enter a new task")
-    if st.button("Add Task"):
-        if new_task:
-            st.session_state.tasks.append({"task": new_task, "done": False})
+st.sidebar.write("---")
+with st.sidebar.form("log_form", clear_on_submit=True):
+    st.write("### Log Study Session")
+    subject = st.selectbox("Subject", ["Math", "Science", "History", "Coding", "English", "French"])
+    hours = st.number_input("Hours", min_value=0.5, max_value=12.0, step=0.5)
+    if st.form_submit_button("Submit Session"):
+        today = datetime.now().strftime("%Y-%m-%d")
+        st.session_state.logs.append({"Date": today, "Subject": subject, "Hours": hours})
 
-    if st.button("Clear Completed Tasks"):
-        st.session_state.tasks = [t for t in st.session_state.tasks if not t["done"]]
+        if st.session_state.last_log_date != today:
+            st.session_state.streak += 1
+            st.session_state.last_log_date = today
         st.rerun()
 
-    st.write("---")
-    
-    for i, task_obj in enumerate(st.session_state.tasks):
-        col1, col2 = st.columns([0.1, 0.9])
-        is_done = st.checkbox(task_obj["task"], key=f"task_{i}", value=task_obj["done"])
-        st.session_state.tasks[i]["done"] = is_done
-        if is_done:
-            col2.write(f"~~{task_obj['task']}~~")
-        else:
-            col2.write(task_obj["task"])
+if st.sidebar.button("Reset All Data"):
+    st.session_state.logs = []
+    st.session_state.streak = 0
+    st.rerun()
 
-elif page == "Study Timer":
-    st.title("Focus Timer")
-    st.write("Deep work session for focused learning.")
-    st.write("---")
+st.title("Academic Intelligence Dashboard")
+total_h, total_xp, level, today_h = calculate_metrics()
 
-    subject = st.selectbox("Select Subject", ["Math", "Science", "Social Studies", "ELA", "French", "Coding"])
-    duration = st.number_input("Duration (Minutes)", min_value=1, value=25)
+m1, m2, m3, m4 = st.columns($)
+m1.metric("Total Level", f"Lvl {level}")
+m2.metric("Total XP", f"{total_xp:,.0f} XP")
+m3.metric("Study Hours", f"{total_h}h", delta=f"{today_h}h Today")
+m4.metric("Daily Streak", f"{st.session_state.streak} Days", delta="Keep it up!")
 
-    if st.button("Start Session"):
-        st.write(f"Currently focusing on {subject}...")
-        bar = st.progress(0)
-        for i in range(100):
-            time.sleep((duration * 60) / 100)
-            bar.progress(i + 1)
+st.write("---")
 
-        earned_xp = duration * 2
-        st.session_state.xp += earned_xp
-        st.success(f"Session complete. You have earned {earned_xp} XP.")
+if not st.session_state.logs:
+    st.info("No study data found. Use the sidebar to log a session or load demo data.")
+else:
+    col_left, col_right = st.columns([2, 1])
 
-elif page == "Grade Predictor":
-    st.title("Grade Predictor")
-    curr = st.number_input("Current Grade Percentage", 0, 100, 85)
-    target = st.number_input("Target Garde Percentage", 0, 100, 90)
-    weight = st.number_input("Final Assessment Weight (%)", 0, 100, 30)
+    with col_left:
+        st.subheader("Progress Over Time")
+        df_plot = pd.DataFrame(st.session_state.logs)
+        df_daily = df_plot.groupby("Data")["Hours"].sum().reset_index()
+        st.line_chart(df_daily.set_index("Data"))
 
-    if st.button("Calculate Requirement"):
-        needed = (target - (curr * (1 - (weight/100)))) / (weight/100)
-        if needed > 100:
-            st.error(f"Required Score: {needed:.1f}%. Additional study recommended.")
-        else:
-            st.success(f"Required Score: {needed:.1f}%")
+    with col_right:
+        st.subheader("Subject Breakdown")
+        df_subj = df_plot.groupby("Subject")["Hours"].sum().reset_index()
+        st.bar_chart(df_subj.set_index("Subject"))
+
+st.write("---")
+quotes = [
+    "Precision in tracking leads to excellence in performance.",
+    "Data is the foundation of academic growth.",
+    "Systematic effort beats inconsistent genius."
+]
+st.caption(f"Strategy: {random.choice(quotes)}")
