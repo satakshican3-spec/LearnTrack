@@ -69,7 +69,7 @@ if st.sidebar.button("Reset All Data"):
 st.title("Academic Intelligence Dashboard")
 total_h, total_xp, level, today_h = calculate_metrics()
 
-m1, m2, m3, m4 = st.columns($)
+m1, m2, m3, m4 = st.columns(4)
 m1.metric("Total Level", f"Lvl {level}")
 m2.metric("Total XP", f"{total_xp:,.0f} XP")
 m3.metric("Study Hours", f"{total_h}h", delta=f"{today_h}h Today")
